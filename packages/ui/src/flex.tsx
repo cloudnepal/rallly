@@ -1,9 +1,13 @@
+import { Slot } from "@radix-ui/react-slot";
+import type { VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import * as React from "react";
 
-import { Slot } from "@radix-ui/react-slot";
+import type {
+  ComponentPropsWithout,
+  RemovedProps,
+} from "./helpers/component-props";
 import { cn } from "./lib/utils";
-import { VariantProps, cva } from "class-variance-authority";
-import { ComponentPropsWithout, RemovedProps } from "./helpers/component-props";
 
 type FlexElement = React.ElementRef<"div">;
 type FlexDivProps = { as?: "div" } & ComponentPropsWithout<"div", RemovedProps>;
@@ -39,8 +43,11 @@ const flexVariants = cva("box-border flex justify-start", {
     },
     gap: {
       none: "gap-0",
-      md: "gap-2.5",
-      lg: "gap-4",
+      xs: "gap-1",
+      sm: "gap-2",
+      md: "gap-4",
+      lg: "gap-6",
+      xl: "gap-8",
     },
   },
   defaultVariants: {
@@ -48,7 +55,7 @@ const flexVariants = cva("box-border flex justify-start", {
     align: "center",
     justify: "start",
     wrap: "noWrap",
-    gap: "md",
+    gap: "none",
   },
 });
 

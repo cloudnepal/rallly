@@ -16,8 +16,11 @@ import * as React from "react";
 import smoothscroll from "smoothscroll-polyfill";
 
 import { TimesShownIn } from "@/components/clock";
+import { OptimizedAvatarImage } from "@/components/optimized-avatar-image";
+import { Participant, ParticipantName } from "@/components/participant";
 import { ParticipantDropdown } from "@/components/participant-dropdown";
 import { useVotingForm } from "@/components/poll/voting-form";
+import { YouAvatar } from "@/components/poll/you-avatar";
 import { useOptions, usePoll } from "@/components/poll-context";
 import { Trans } from "@/components/trans";
 import { usePermissions } from "@/contexts/permissions";
@@ -25,7 +28,6 @@ import { usePermissions } from "@/contexts/permissions";
 import { useVisibleParticipants } from "../participants-provider";
 import { useUser } from "../user-provider";
 import GroupedOptions from "./mobile-poll/grouped-options";
-import UserAvatar, { YouAvatar } from "./user-avatar";
 
 if (typeof window !== "undefined") {
   smoothscroll.polyfill();
@@ -99,20 +101,25 @@ const MobilePoll: React.FunctionComponent = () => {
                 </SelectItem>
                 {visibleParticipants.map((participant) => (
                   <SelectItem key={participant.id} value={participant.id}>
-                    <div className="flex items-center gap-x-2.5">
-                      <UserAvatar
-                        name={participant.name}
-                        showName={true}
-                        isYou={session.ownsObject(participant)}
-                      />
-                    </div>
+                    <Participant>
+                      <OptimizedAvatarImage name={participant.name} size="xs" />
+                      <ParticipantName>{participant.name}</ParticipantName>
+                      {session.ownsObject(participant) && (
+                        <Badge>
+                          <Trans i18nKey="you" />
+                        </Badge>
+                      )}
+                    </Participant>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           ) : (
             <div className="flex grow items-center px-1">
-              <YouAvatar />
+              <Participant>
+                <YouAvatar />
+                <ParticipantName>{t("you")}</ParticipantName>
+              </Participant>
             </div>
           )}
           {isEditing ? (
@@ -131,7 +138,12 @@ const MobilePoll: React.FunctionComponent = () => {
             <ParticipantDropdown
               align="end"
               disabled={!canEditParticipant(selectedParticipant.id)}
-              participant={selectedParticipant}
+              participant={{
+                name: selectedParticipant.name,
+                userId: selectedParticipant.userId ?? undefined,
+                email: selectedParticipant.email ?? undefined,
+                id: selectedParticipant.id,
+              }}
               onEdit={() => {
                 votingForm.setEditingParticipantId(selectedParticipant.id);
               }}

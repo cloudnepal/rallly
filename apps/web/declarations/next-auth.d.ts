@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { TimeFormat } from "@rallly/database";
-import { extend } from "lodash";
-import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
-import { DefaultJWT, JWT } from "next-auth/jwt";
+import type { DefaultSession, DefaultUser } from "next-auth";
+import NextAuth from "next-auth";
+import type { DefaultJWT } from "next-auth/jwt";
+import { JWT } from "next-auth/jwt";
 
 declare module "next-auth" {
   /**
@@ -11,13 +12,11 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      name?: string | null;
-      email?: string | null;
       timeZone?: string | null;
       timeFormat?: TimeFormat | null;
       locale?: string | null;
       weekStart?: number | null;
-    };
+    } & DefaultSession["user"];
   }
 
   interface User extends DefaultUser {

@@ -1,5 +1,5 @@
 "use client";
-import { Participant, VoteType } from "@rallly/database";
+import type { Participant, VoteType } from "@rallly/database";
 import { cn } from "@rallly/ui";
 import { Button } from "@rallly/ui/button";
 import { Icon } from "@rallly/ui/icon";
@@ -7,11 +7,11 @@ import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import * as React from "react";
 import { useToggle } from "react-use";
 
-import { useTranslation } from "@/app/i18n/client";
+import { OptimizedAvatarImage } from "@/components/optimized-avatar-image";
 import { useParticipants } from "@/components/participants-provider";
-import { UserAvatar } from "@/components/user";
 import { usePoll } from "@/contexts/poll";
 import { useRole } from "@/contexts/role";
+import { useTranslation } from "@/i18n/client";
 
 import { ConnectedScoreSummary } from "../score-summary";
 import VoteIcon from "../vote-icon";
@@ -51,39 +51,39 @@ const PollOptionVoteSummary: React.FunctionComponent<{ optionId: string }> = ({
             {participantsWhoVotedYes.map(({ name }, i) => (
               <div key={i} className="flex">
                 <div className="relative mr-2.5 flex size-5 items-center justify-center">
-                  <UserAvatar size="xs" name={name} />
+                  <OptimizedAvatarImage size="xs" name={name} />
                   <VoteIcon
                     type="yes"
                     size="sm"
-                    className="absolute bottom-full left-full -translate-x-1/2 translate-y-1/2 rounded-full bg-white"
+                    className="absolute bottom-full left-full -translate-x-1.5 translate-y-2.5 rounded-full bg-white"
                   />
                 </div>
                 <div className="truncate text-sm">{name}</div>
               </div>
             ))}
-          </div>
-          <div className="col-span-1 space-y-2.5">
             {participantsWhoVotedIfNeedBe.map(({ name }, i) => (
               <div key={i} className="flex">
                 <div className="relative mr-2.5 flex size-5 items-center justify-center">
-                  <UserAvatar size="xs" name={name} />
+                  <OptimizedAvatarImage size="xs" name={name} />
                   <VoteIcon
                     type="ifNeedBe"
                     size="sm"
-                    className="absolute bottom-full left-full -translate-x-1/2 translate-y-1/2 rounded-full bg-white"
+                    className="absolute bottom-full left-full -translate-x-1.5 translate-y-2.5 rounded-full bg-white"
                   />
                 </div>
                 <div className="truncate text-sm"> {name}</div>
               </div>
             ))}
+          </div>
+          <div className="col-span-1 space-y-2.5">
             {participantsWhoVotedNo.map(({ name }, i) => (
               <div key={i} className="flex">
                 <div className="relative mr-2.5 flex size-5 items-center justify-center">
-                  <UserAvatar size="xs" name={name} />
+                  <OptimizedAvatarImage size="xs" name={name} />
                   <VoteIcon
                     type="no"
                     size="sm"
-                    className="absolute bottom-full left-full -translate-x-1/2 translate-y-1/2 rounded-full bg-white"
+                    className="absolute bottom-full left-full -translate-x-1.5 translate-y-2.5 rounded-full bg-white"
                   />
                 </div>
                 <div className="truncate text-sm">{name}</div>

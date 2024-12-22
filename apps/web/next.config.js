@@ -8,17 +8,22 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
 
+require("dotenv").config({
+  path: "../../.env",
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output:
     process.env.NEXT_PUBLIC_SELF_HOSTED === "true" ? "standalone" : undefined,
   productionBrowserSourceMaps: true,
   transpilePackages: [
-    "@rallly/backend",
     "@rallly/database",
     "@rallly/icons",
     "@rallly/ui",
     "@rallly/tailwind-config",
+    "@rallly/posthog",
+    "@rallly/emails",
   ],
   webpack(config) {
     config.module.rules.push({
@@ -47,6 +52,10 @@ const nextConfig = {
         permanent: true,
       },
     ];
+  },
+  experimental: {
+    // necessary for server actions using aws-sdk
+    serverComponentsExternalPackages: ["@aws-sdk"],
   },
 };
 
@@ -88,6 +97,7 @@ const sentryWebpackPluginOptions = {
 const withBundleAnalyzerConfig = withBundleAnalyzer(nextConfig);
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
-module.exports = process.env.SENTRY_AUTH_TOKEN
-  ? withSentryConfig(withBundleAnalyzerConfig, sentryWebpackPluginOptions)
-  : withBundleAnalyzerConfig;
+module.exports = withSentryConfig(
+  withBundleAnalyzerConfig,
+  sentryWebpackPluginOptions,
+);

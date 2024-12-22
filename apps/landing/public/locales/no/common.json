@@ -19,9 +19,10 @@
   "pricing": "Priser",
   "bestDoodleAlternative": "Det beste Doodle-alternativet",
   "freeSchedulingPoll": "Gratis planleggingsavstemning",
-  "findATime": "Finn et tidspunkt",
   "getStarted": "Kom igang",
   "availabilityPoll": "Tilgjengelighetsavstemning",
   "solutions": "Løsninger",
-  "howItWorks": "Slik fungerer det"
+  "howItWorks": "Slik fungerer det",
+  "status": "Status",
+  "when2MeetAlternative": "Alternativ til When2Meet"
 }

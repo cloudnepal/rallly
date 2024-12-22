@@ -1,32 +1,34 @@
 "use client";
-import { Session } from "next-auth";
+import { usePostHog } from "@rallly/posthog/client";
+import type { Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import React from "react";
-import { z } from "zod";
 
-import { useTranslation } from "@/app/i18n/client";
 import { Spinner } from "@/components/spinner";
 import { useSubscription } from "@/contexts/plan";
-import { PostHogProvider } from "@/contexts/posthog";
 import { PreferencesProvider } from "@/contexts/preferences";
+import { useTranslation } from "@/i18n/client";
+import { trpc } from "@/trpc/client";
 
 import { useRequiredContext } from "./use-required-context";
 
-const userSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  email: z.string().email().nullable(),
-  isGuest: z.boolean(),
-  tier: z.enum(["guest", "hobby", "pro"]),
-  timeZone: z.string().nullish(),
-  timeFormat: z.enum(["hours12", "hours24"]).nullish(),
-  weekStart: z.number().min(0).max(6).nullish(),
-});
+type UserData = {
+  id: string;
+  name: string;
+  email?: string | null;
+  isGuest: boolean;
+  tier: "guest" | "hobby" | "pro";
+  timeZone?: string | null;
+  timeFormat?: "hours12" | "hours24" | null;
+  weekStart?: number | null;
+  image?: string | null;
+  locale?: string | null;
+};
 
 export const UserContext = React.createContext<{
-  user: z.infer<typeof userSchema>;
+  user: UserData;
   refresh: (data?: Record<string, unknown>) => Promise<Session | null>;
-  ownsObject: (obj: { userId: string | null }) => boolean;
+  ownsObject: (obj: { userId?: string | null }) => boolean;
 } | null>(null);
 
 export const useUser = () => {
@@ -55,8 +57,27 @@ export const UserProvider = (props: { children?: React.ReactNode }) => {
   const session = useSession();
   const user = session.data?.user;
   const subscription = useSubscription();
+  const updatePreferences = trpc.user.updatePreferences.useMutation();
+  const { t, i18n } = useTranslation();
 
-  const { t } = useTranslation();
+  const posthog = usePostHog();
+
+  const isGuest = !user?.email;
+  const tier = isGuest ? "guest" : subscription?.active ? "pro" : "hobby";
+
+  React.useEffect(() => {
+    if (user?.email) {
+      posthog?.identify(user.id, {
+        email: user.email,
+        name: user.name,
+        tier,
+        timeZone: user.timeZone ?? null,
+        image: user.image ?? null,
+        locale: user.locale ?? i18n.language,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   if (!user) {
     return (
@@ -66,9 +87,6 @@ export const UserProvider = (props: { children?: React.ReactNode }) => {
     );
   }
 
-  const isGuest = !user.email;
-  const tier = isGuest ? "guest" : subscription?.active ? "pro" : "hobby";
-
   return (
     <UserContext.Provider
       value={{
@@ -76,8 +94,11 @@ export const UserProvider = (props: { children?: React.ReactNode }) => {
           id: user.id as string,
           name: user.name ?? t("guest"),
           email: user.email || null,
-          isGuest: !user.email,
+          isGuest,
           tier,
+          timeZone: user.timeZone ?? null,
+          image: user.image ?? null,
+          locale: user.locale ?? i18n.language,
         },
         refresh: session.update,
         ownsObject: ({ userId }) => {
@@ -93,10 +114,18 @@ export const UserProvider = (props: { children?: React.ReactNode }) => {
           weekStart: user.weekStart ?? undefined,
         }}
         onUpdate={async (newPreferences) => {
+          if (!isGuest) {
+            await updatePreferences.mutateAsync({
+              locale: newPreferences.locale ?? undefined,
+              timeZone: newPreferences.timeZone ?? undefined,
+              timeFormat: newPreferences.timeFormat ?? undefined,
+              weekStart: newPreferences.weekStart ?? undefined,
+            });
+          }
           await session.update(newPreferences);
         }}
       >
-        <PostHogProvider>{props.children}</PostHogProvider>
+        {props.children}
       </PreferencesProvider>
     </UserContext.Provider>
   );

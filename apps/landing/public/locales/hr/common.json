@@ -19,8 +19,9 @@
   "pricing": "Cijene",
   "bestDoodleAlternative": "Najbolja besplatna alternativa za Doodle",
   "freeSchedulingPoll": "Besplatne ankete za dogovor oko rasporeda",
-  "findATime": "Pronađi vrijeme",
   "getStarted": "Započnite",
   "availabilityPoll": "Anketa o dostupnosti",
-  "solutions": "Rješenja"
+  "solutions": "Rješenja",
+  "howItWorks": "Kako to funkcionira",
+  "status": "Stanje"
 }

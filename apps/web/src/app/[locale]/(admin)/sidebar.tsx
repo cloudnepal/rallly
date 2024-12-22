@@ -1,7 +1,9 @@
 "use client";
 
+import { usePostHog } from "@rallly/posthog/client";
 import { cn } from "@rallly/ui";
 import { Button } from "@rallly/ui/button";
+import { DialogTrigger } from "@rallly/ui/dialog";
 import { Icon } from "@rallly/ui/icon";
 import {
   ArrowUpRightIcon,
@@ -18,12 +20,13 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { OptimizedAvatarImage } from "@/components/optimized-avatar-image";
+import { PayWallDialog } from "@/components/pay-wall-dialog";
 import { ProBadge } from "@/components/pro-badge";
 import { Trans } from "@/components/trans";
-import { CurrentUserAvatar } from "@/components/user";
 import { IfGuest, useUser } from "@/components/user-provider";
 import { IfFreeUser } from "@/contexts/plan";
-import { IconComponent } from "@/types";
+import type { IconComponent } from "@/types";
 
 function NavItem({
   href,
@@ -58,8 +61,9 @@ function NavItem({
 export function Sidebar() {
   const pathname = usePathname();
   const { user } = useUser();
+  const posthog = usePostHog();
   return (
-    <nav className="flex flex-1 flex-col ">
+    <nav className="flex flex-1 flex-col">
       <ul role="list" className="flex flex-1 flex-col gap-y-7">
         <li>
           <ul role="list" className="-mx-2 space-y-1">
@@ -102,24 +106,28 @@ export function Sidebar() {
           <ul role="list" className="-mx-2 space-y-1">
             <IfFreeUser>
               <li>
-                <Link
-                  href="/settings/billing"
-                  className="mb-4 grid rounded-md border bg-gray-50 px-4 py-3 focus:border-gray-300 focus:bg-gray-200"
-                >
-                  <span className="mb-2 flex items-center gap-x-2">
-                    <SparklesIcon className="size-5 text-gray-400" />
-                    <span className="text-sm font-bold">
-                      <Trans i18nKey="upgrade" />
+                <PayWallDialog>
+                  <DialogTrigger
+                    className="mb-4 flex w-full flex-col rounded-md border bg-gray-50 px-4 py-3 text-left focus:border-gray-300 focus:bg-gray-200"
+                    onClick={() =>
+                      posthog?.capture("trigger paywall", { from: "sidebar" })
+                    }
+                  >
+                    <span className="mb-2 flex items-center gap-x-2">
+                      <SparklesIcon className="size-5 text-gray-400" />
+                      <span className="text-sm font-bold">
+                        <Trans i18nKey="upgrade" />
+                      </span>
+                      <ProBadge />
                     </span>
-                    <ProBadge />
-                  </span>
-                  <span className="text-sm leading-relaxed text-gray-500">
-                    <Trans
-                      i18nKey="unlockFeatures"
-                      defaults="Unlock all Pro features."
-                    />
-                  </span>
-                </Link>
+                    <span className="text-sm leading-relaxed text-gray-500">
+                      <Trans
+                        i18nKey="unlockFeatures"
+                        defaults="Unlock all Pro features."
+                      />
+                    </span>
+                  </DialogTrigger>
+                </PayWallDialog>
               </li>
             </IfFreeUser>
             <IfGuest>
@@ -161,7 +169,11 @@ export function Sidebar() {
               >
                 <Link href="/settings/profile">
                   <div>
-                    <CurrentUserAvatar />
+                    <OptimizedAvatarImage
+                      src={user.image ?? undefined}
+                      name={user.name}
+                      size="md"
+                    />
                   </div>
                   <span className="ml-1 grid grow">
                     <span className="font-semibold">{user.name}</span>

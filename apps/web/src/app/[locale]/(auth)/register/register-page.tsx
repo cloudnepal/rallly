@@ -1,5 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { usePostHog } from "@rallly/posthog/client";
 import { Button } from "@rallly/ui/button";
 import {
   Form,
@@ -15,7 +16,6 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useTranslation } from "next-i18next";
-import { usePostHog } from "posthog-js/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -23,12 +23,12 @@ import { z } from "zod";
 import { VerifyCode } from "@/components/auth/auth-forms";
 import { AuthCard } from "@/components/auth/auth-layout";
 import { Trans } from "@/components/trans";
+import { trpc } from "@/trpc/client";
 import { useDayjs } from "@/utils/dayjs";
-import { trpc } from "@/utils/trpc/client";
 
 const registerFormSchema = z.object({
-  name: z.string().nonempty().max(100),
-  email: z.string().email(),
+  name: z.string().trim().min(1).max(100),
+  email: z.string().email().max(255),
 });
 
 type RegisterFormData = z.infer<typeof registerFormSchema>;
@@ -44,7 +44,6 @@ export const RegisterForm = () => {
   });
 
   const { handleSubmit, control, getValues, setError, formState } = form;
-  const queryClient = trpc.useUtils();
   const requestRegistration = trpc.auth.requestRegistration.useMutation();
   const authenticateRegistration =
     trpc.auth.authenticateRegistration.useMutation();
@@ -68,7 +67,6 @@ export const RegisterForm = () => {
               throw new Error("Failed to authenticate user");
             }
 
-            queryClient.invalidate();
 
             posthog?.identify(res.user.id, {
               email: res.user.email,

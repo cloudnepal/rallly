@@ -1,8 +1,12 @@
-import { randomid } from "@rallly/backend/utils/nanoid";
-import { NextRequest, NextResponse } from "next/server";
-import { encode, JWT } from "next-auth/jwt";
+import languages from "@rallly/languages";
+import { absoluteUrl } from "@rallly/utils/absolute-url";
+import { randomid } from "@rallly/utils/nanoid";
+import languageParser from "accept-language-parser";
+import type { NextRequest, NextResponse } from "next/server";
+import type { JWT } from "next-auth/jwt";
+import { decode, encode } from "next-auth/jwt";
 
-import { absoluteUrl } from "@/utils/absolute-url";
+const supportedLocales = Object.keys(languages);
 
 function getCookieSettings() {
   const secure = absoluteUrl().startsWith("https://");
@@ -12,6 +16,16 @@ function getCookieSettings() {
     secure,
     name,
   };
+}
+
+export async function getLocaleFromHeader(req: NextRequest) {
+  // Check if locale is specified in header
+  const headers = req.headers;
+  const acceptLanguageHeader = headers.get("accept-language");
+  const localeFromHeader = acceptLanguageHeader
+    ? languageParser.pick(supportedLocales, acceptLanguageHeader)
+    : null;
+  return localeFromHeader ?? "en";
 }
 
 async function setCookie(res: NextResponse, jwt: JWT) {
@@ -32,11 +46,14 @@ async function setCookie(res: NextResponse, jwt: JWT) {
   });
 }
 
-export async function resetUser(res: NextResponse) {
+export async function resetUser(req: NextRequest, res: NextResponse) {
   // resets to a new guest user
+  const locale = await getLocaleFromHeader(req);
+
   const jwt: JWT = {
     sub: `user-${randomid()}`,
     email: null,
+    locale,
   };
 
   await setCookie(res, jwt);
@@ -44,15 +61,28 @@ export async function resetUser(res: NextResponse) {
 
 export async function initGuest(req: NextRequest, res: NextResponse) {
   const { name } = getCookieSettings();
-
-  if (req.cookies.has(name)) {
-    // already has a session token
-    return;
+  const token = req.cookies.get(name)?.value;
+  if (token) {
+    try {
+      const jwt = await decode({
+        token,
+        secret: process.env.SECRET_PASSWORD,
+      });
+      if (jwt) {
+        return jwt;
+      }
+    } catch (error) {
+      // invalid token
+      console.error(error);
+    }
   }
+
+  const locale = await getLocaleFromHeader(req);
 
   const jwt: JWT = {
     sub: `user-${randomid()}`,
     email: null,
+    locale,
   };
 
   await setCookie(res, jwt);

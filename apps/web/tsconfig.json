@@ -3,22 +3,17 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "~/*": ["public/*"],
+      "@/*": ["src/*"]
     },
     "strictNullChecks": true,
+    "types": ["vitest/globals"]
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     "**/*.js",
     ".next/types/**/*.ts",
-    "vitest.config.mts",
+    "vitest.config.mts"
   ],
-  "exclude": [
-    "node_modules",
-    ".next/**/*",
-    "playwright-report",
-    "test-results",
-  ],
+  "exclude": ["node_modules", ".next/**/*", "playwright-report", "test-results"]
 }

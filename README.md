@@ -37,7 +37,7 @@ The following instructions are for running the project locally for development.
 
 2. Install dependencies
 
-   ```
+   ```bash
    yarn
    ```
 
@@ -51,19 +51,25 @@ The following instructions are for running the project locally for development.
 
    **Note:** `.env.development` is preconfigured with default values for development. You can leave these as is for local development.
 
-4. Setup database
+4. Generate Prisma client
+
+   ```bash
+   yarn db:generate
+   ```
+
+5. Setup database
 
    You will need to have [Docker](https://docs.docker.com/get-docker/) installed and running to run the database using the provided docker-compose file.
 
    To start the database, run:
 
-   ```
+   ```bash
    yarn docker:up
    ```
 
    Next run the following command to setup the database:
 
-   ```
+   ```bash
    yarn db:reset
    ```
 
@@ -73,9 +79,9 @@ The following instructions are for running the project locally for development.
    - run migrations to create a new database schema
    - seed the database with test users and random data
 
-5. Start the Next.js server
+6. Start the Next.js server
 
-   ```
+   ```bash
    yarn dev
    ```
 
@@ -113,8 +119,8 @@ And thank you to these companies for sponsoring and showing support for this pro
 --><a href="https://ura.design?utm_source=rallly"><img height="24" alt="Ura Design" src="./assets/images/ura-logo-blue.svg"></a>
 </p>
 <p>
-<a href="https://m.do.co/c/f91efc9c9e50"><img src="./apps/landing/public/digitalocean.svg" alt="Digital Ocean" height="24" /></a>&nbsp;&nbsp;&nbsp;<!--
---><a href="https://sentry.io?utm_source=rallly"><img src="./apps/landing/public/sentry.svg" alt="Sentry" height="24" /></a>&nbsp;&nbsp;&nbsp;<!--
+<a href="https://m.do.co/c/f91efc9c9e50"><img src="./assets/images/digitalocean-logo.svg" alt="Digital Ocean" height="24" /></a>&nbsp;&nbsp;&nbsp;<!--
+--><a href="https://sentry.io?utm_source=rallly"><img src="./assets/images/sentry.svg" alt="Sentry" height="24" /></a>&nbsp;&nbsp;&nbsp;<!--
 --><a href="https://cloudron.io?utm_source=rallly"><img src="./assets/images/cloudron-logo.svg" alt="Cloudron" height="30"></a>&nbsp;&nbsp;&nbsp;<!--
 --><a href="https://featurebase.app?utm_source=rallly"><img src="./assets/images/featurebase.svg" alt="Featurebase" height="28"></a>
 </p>

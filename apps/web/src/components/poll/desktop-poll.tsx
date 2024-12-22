@@ -23,11 +23,11 @@ import {
   EmptyStateIcon,
   EmptyStateTitle,
 } from "@/app/components/empty-state";
-import { useTranslation } from "@/app/i18n/client";
 import { TimesShownIn } from "@/components/clock";
 import { useVotingForm } from "@/components/poll/voting-form";
 import { usePermissions } from "@/contexts/permissions";
 import { usePoll } from "@/contexts/poll";
+import { useTranslation } from "@/i18n/client";
 
 import {
   useParticipants,
@@ -36,6 +36,24 @@ import {
 import ParticipantRow from "./desktop-poll/participant-row";
 import ParticipantRowForm from "./desktop-poll/participant-row-form";
 import PollHeader from "./desktop-poll/poll-header";
+
+function EscapeListener({ onEscape }: { onEscape: () => void }) {
+  React.useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onEscape();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [onEscape]);
+
+  return null;
+}
 
 const useIsOverflowing = <E extends Element | null>(
   ref: React.RefObject<E>,
@@ -204,6 +222,7 @@ const DesktopPoll: React.FunctionComponent = () => {
               </TooltipContent>
             </Tooltip>
           )}
+          {expanded ? <EscapeListener onEscape={collapse} /> : null}
         </div>
       </div>
     );
@@ -251,9 +270,9 @@ const DesktopPoll: React.FunctionComponent = () => {
               <TableControls />
             </CardHeader>
             {poll.options[0]?.duration !== 0 && poll.timeZone ? (
-              <CardHeader>
+              <div className="border-b bg-gray-50 px-4 py-3">
                 <TimesShownIn />
-              </CardHeader>
+              </div>
             ) : null}
             {participants.length > 0 || mode !== "view" ? (
               <div className="relative flex min-h-0 flex-col">
@@ -272,7 +291,7 @@ const DesktopPoll: React.FunctionComponent = () => {
                     "scrollbar-thin hover:scrollbar-thumb-gray-400 scrollbar-thumb-gray-300 scrollbar-track-gray-100 relative z-10 flex-grow overflow-auto scroll-smooth",
                   )}
                 >
-                  <table className="w-full table-auto border-separate border-spacing-0 bg-gray-50  ">
+                  <table className="w-full table-auto border-separate border-spacing-0 bg-gray-50">
                     <thead>
                       <PollHeader />
                     </thead>
@@ -285,7 +304,13 @@ const DesktopPoll: React.FunctionComponent = () => {
                             return (
                               <ParticipantRow
                                 key={i}
-                                participant={participant}
+                                participant={{
+                                  id: participant.id,
+                                  name: participant.name,
+                                  userId: participant.userId ?? undefined,
+                                  email: participant.email ?? undefined,
+                                  votes: participant.votes,
+                                }}
                                 editMode={
                                   votingForm.watch("mode") === "edit" &&
                                   votingForm.watch("participantId") ===

@@ -1,16 +1,16 @@
 import languages from "@rallly/languages";
-import languageParser from "accept-language-parser";
+import { withPostHog } from "@rallly/posthog/next/middleware";
 import { NextResponse } from "next/server";
 import withAuth from "next-auth/middleware";
 
-import { initGuest } from "@/app/guest";
+import { getLocaleFromHeader, initGuest } from "@/app/guest";
 import { isSelfHosted } from "@/utils/constants";
 
 const supportedLocales = Object.keys(languages);
 
 export const middleware = withAuth(
   async function middleware(req) {
-    const { headers, nextUrl } = req;
+    const { nextUrl } = req;
     const newUrl = nextUrl.clone();
 
     // if the user is already logged in, don't let them access the login page
@@ -23,23 +23,23 @@ export const middleware = withAuth(
     }
 
     // Check if locale is specified in cookie
-    const preferredLocale = req.nextauth.token?.locale;
-    if (preferredLocale && supportedLocales.includes(preferredLocale)) {
-      newUrl.pathname = `/${preferredLocale}${newUrl.pathname}`;
+    let locale = req.nextauth.token?.locale;
+    if (locale && supportedLocales.includes(locale)) {
+      newUrl.pathname = `/${locale}${newUrl.pathname}`;
     } else {
       // Check if locale is specified in header
-      const acceptLanguageHeader = headers.get("accept-language");
-      const localeFromHeader = acceptLanguageHeader
-        ? languageParser.pick(supportedLocales, acceptLanguageHeader)
-        : null;
-      const locale = localeFromHeader ?? "en";
+      locale = await getLocaleFromHeader(req);
 
       newUrl.pathname = `/${locale}${newUrl.pathname}`;
     }
 
     const res = NextResponse.rewrite(newUrl);
 
-    await initGuest(req, res);
+    const jwt = await initGuest(req, res);
+
+    if (jwt?.sub) {
+      await withPostHog(res, { distinctID: jwt.sub });
+    }
 
     return res;
   },

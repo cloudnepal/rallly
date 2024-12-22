@@ -1,4 +1,5 @@
 "use client";
+import { usePostHog } from "@rallly/posthog/client";
 import { cn } from "@rallly/ui";
 import { Badge } from "@rallly/ui/badge";
 import { Button } from "@rallly/ui/button";
@@ -15,7 +16,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@rallly/ui/dropdown-menu";
+import { useToast } from "@rallly/ui/hooks/use-toast";
 import { Icon } from "@rallly/ui/icon";
+import { Input } from "@rallly/ui/input";
 import { Textarea } from "@rallly/ui/textarea";
 import dayjs from "dayjs";
 import {
@@ -27,18 +30,17 @@ import { useTranslation } from "next-i18next";
 import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
 
+import { OptimizedAvatarImage } from "@/components/optimized-avatar-image";
+import { Participant, ParticipantName } from "@/components/participant";
 import { useParticipants } from "@/components/participants-provider";
 import { Trans } from "@/components/trans";
 import { usePermissions } from "@/contexts/permissions";
 import { usePoll } from "@/contexts/poll";
 import { useRole } from "@/contexts/role";
-import { usePostHog } from "@/utils/posthog";
-import { trpc } from "@/utils/trpc/client";
+import { trpc } from "@/trpc/client";
 
 import { requiredString } from "../../utils/form-validation";
-import NameInput from "../name-input";
 import TruncatedLinkify from "../poll/truncated-linkify";
-import UserAvatar from "../poll/user-avatar";
 import { useUser } from "../user-provider";
 
 interface CommentForm {
@@ -71,14 +73,6 @@ function NewCommentForm({
 
   const posthog = usePostHog();
 
-  const queryClient = trpc.useUtils();
-
-  const addComment = trpc.polls.comments.add.useMutation({
-    onSuccess: () => {
-      queryClient.polls.comments.invalidate();
-      posthog?.capture("created comment");
-    },
-  });
 
   const session = useUser();
 
@@ -89,7 +83,19 @@ function NewCommentForm({
         content: "",
       },
     });
+  const { toast } = useToast();
 
+  const addComment = trpc.polls.comments.add.useMutation({
+    onSuccess: () => {
+      posthog?.capture("created comment");
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+      });
+    },
+  });
   return (
     <form
       className="w-full space-y-2.5"
@@ -119,7 +125,13 @@ function NewCommentForm({
           control={control}
           rules={{ validate: requiredString }}
           render={({ field }) => (
-            <NameInput error={!!formState.errors.authorName} {...field} />
+            <Input
+              placeholder={t("yourName")}
+              className="lg:w-48"
+              data-1p-ignore="true"
+              error={!!formState.errors.authorName}
+              {...field}
+            />
           )}
         />
       </div>
@@ -152,9 +164,6 @@ function DiscussionInner() {
 
   const { data: comments } = trpc.polls.comments.list.useQuery(
     { pollId },
-    {
-      staleTime: 1000 * 5,
-    },
   );
   const posthog = usePostHog();
 
@@ -203,12 +212,19 @@ function DiscussionInner() {
                 <div className="" key={comment.id}>
                   <div data-testid="comment">
                     <div className="mb-1 flex items-center space-x-2">
-                      <UserAvatar
-                        name={comment.authorName}
-                        showName={true}
-                        isYou={session.ownsObject(comment)}
-                      />
-                      <div className="flex items-center gap-2 text-sm ">
+                      <Participant>
+                        <OptimizedAvatarImage
+                          name={comment.authorName}
+                          size="xs"
+                        />
+                        <ParticipantName>{comment.authorName}</ParticipantName>
+                        {session.ownsObject(comment) ? (
+                          <Badge>
+                            <Trans i18nKey="you" />
+                          </Badge>
+                        ) : null}
+                      </Participant>
+                      <div className="flex items-center gap-2 text-sm">
                         <div className="text-gray-500">
                           {dayjs(comment.createdAt).fromNow()}
                         </div>
@@ -236,7 +252,7 @@ function DiscussionInner() {
                         )}
                       </div>
                     </div>
-                    <div className="ml-0.5 w-fit whitespace-pre-wrap pl-7 text-sm leading-relaxed">
+                    <div className="w-fit whitespace-pre-wrap pl-7 text-sm leading-relaxed">
                       <TruncatedLinkify>{comment.content}</TruncatedLinkify>
                     </div>
                   </div>

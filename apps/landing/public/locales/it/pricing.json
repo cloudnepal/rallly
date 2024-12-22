@@ -1,5 +1,4 @@
 {
-  "pricing": "Prezzi",
   "pricingDescription": "Inizia gratuitamente. Nessun login richiesto.",
   "freeForever": "gratis per sempre",
   "planPro": "Piano professionale",
@@ -28,6 +27,6 @@
   "keepPollsIndefinitely": "Conservare i sondaggi a tempo indeterminato",
   "whenPollInactive": "Quando un sondaggio diventa inattivo?",
   "whenPollInactiveAnswer": "I sondaggi diventano inattivi quando tutte le opzioni di data sono nel passato E non si accede al sondaggio da oltre 30 giorni. I sondaggi inattivi vengono automaticamente eliminati se non hai un abbonamento a pagamento.",
-  "discount": "Risparmia {amount}",
-  "yearlyBillingDescription": "all'anno"
+  "yearlyBillingDescription": "all'anno",
+  "annualBenefit": "{count} mesi gratis"
 }

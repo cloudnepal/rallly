@@ -1,5 +1,4 @@
 {
-  "pricing": "Precios",
   "pricingDescription": "Comience a utilizarlo gratis. No se necesita tarjeta de crédito.",
   "freeForever": "gratis para siempre",
   "planPro": "Pro",
@@ -28,6 +27,6 @@
   "keepPollsIndefinitely": "Mantener encuestas indefinidamente",
   "whenPollInactive": "¿Cuándo una encuesta se vuelve inactiva?",
   "whenPollInactiveAnswer": "Las encuestas se vuelven inactivas cuando todas las opciones de fecha están en el pasado Y la encuesta no ha sido accedida durante más de 30 días. Las encuestas inactivas se eliminan automáticamente si no tienes una suscripción de pago.",
-  "discount": "Ahorre {amount}",
-  "yearlyBillingDescription": "por año"
+  "yearlyBillingDescription": "por año",
+  "annualBenefit": "{count} meses gratis"
 }

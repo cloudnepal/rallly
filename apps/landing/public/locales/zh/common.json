@@ -19,10 +19,11 @@
   "pricing": "价格",
   "bestDoodleAlternative": "最好的 Doodle 替代品",
   "freeSchedulingPoll": "免费的日程投票",
-  "findATime": "找个时间见面",
   "getStarted": "开始使用",
   "availabilityPoll": "可用性投票",
   "solutions": "解決方案",
   "howItWorks": "如何使用",
-  "status": "状态"
+  "status": "状态",
+  "when2MeetAlternative": "When2Meet 替代品",
+  "meetingPoll": "会议投票"
 }

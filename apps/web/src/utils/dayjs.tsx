@@ -1,4 +1,4 @@
-import { TimeFormat } from "@rallly/database";
+import type { TimeFormat } from "@rallly/database";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import duration from "dayjs/plugin/duration";
@@ -39,6 +39,11 @@ const dayjsLocales: Record<
     timeFormat: "hours12",
     import: () => import("dayjs/locale/en"),
   },
+  "en-GB": {
+    weekStart: 1,
+    timeFormat: "hours24",
+    import: () => import("dayjs/locale/en-gb"),
+  },
   es: {
     weekStart: 1,
     timeFormat: "hours24",
@@ -73,6 +78,11 @@ const dayjsLocales: Record<
     weekStart: 1,
     timeFormat: "hours24",
     import: () => import("dayjs/locale/hr"),
+  },
+  ja: {
+    weekStart: 1,
+    timeFormat: "hours24",
+    import: () => import("dayjs/locale/ja"),
   },
   it: {
     weekStart: 1,

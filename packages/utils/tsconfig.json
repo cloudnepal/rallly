@@ -1,4 +1,7 @@
 {
-  "extends": "@rallly/tsconfig/react.json",
-  "include": ["**/*.ts", "**/*.tsx"],
+  "compilerOptions": {
+    "types": ["vitest/globals"]
+  },
+  "extends": "@rallly/tsconfig/base.json",
+  "include": ["**/*.ts", "**/*.tsx"]
 }

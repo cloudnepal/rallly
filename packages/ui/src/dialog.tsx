@@ -5,6 +5,7 @@ import { XIcon } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "./lib/utils";
+
 export type { DialogProps } from "@radix-ui/react-dialog";
 
 const Dialog = DialogPrimitive.Root;
@@ -53,7 +54,8 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "animate-in data-[state=open]:fade-in data-[state=open]:slide-in-from-top-8 shadow-huge z-50 grid w-full translate-y-0 gap-4 overflow-hidden rounded-md bg-white p-4",
+        "animate-in data-[state=open]:fade-in data-[state=open]:slide-in-from-top-8 shadow-huge z-50 grid w-full translate-y-0 gap-4 overflow-y-auto rounded-md bg-white p-4",
+        "max-h-[calc(100vh-2rem)]", // Add this line
         {
           "sm:max-w-sm": size === "sm",
           "sm:max-w-md": size === "md",

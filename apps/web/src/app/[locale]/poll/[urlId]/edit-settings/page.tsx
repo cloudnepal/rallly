@@ -6,10 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
-import {
-  PollSettingsForm,
-  PollSettingsFormData,
-} from "@/components/forms/poll-settings";
+import type { PollSettingsFormData } from "@/components/forms/poll-settings";
+import { PollSettingsForm } from "@/components/forms/poll-settings";
 import { useUpdatePollMutation } from "@/components/poll/mutations";
 import { Trans } from "@/components/trans";
 import { usePoll } from "@/contexts/poll";

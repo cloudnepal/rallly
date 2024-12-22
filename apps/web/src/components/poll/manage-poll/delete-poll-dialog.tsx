@@ -1,3 +1,4 @@
+import { usePostHog } from "@rallly/posthog/client";
 import { Button } from "@rallly/ui/button";
 import {
   Dialog,
@@ -10,8 +11,7 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 
 import { Trans } from "@/components/trans";
-import { usePostHog } from "@/utils/posthog";
-import { trpc } from "@/utils/trpc/client";
+import { trpc } from "@/trpc/client";
 
 export const DeletePollDialog: React.FunctionComponent<{
   open: boolean;
@@ -19,11 +19,9 @@ export const DeletePollDialog: React.FunctionComponent<{
   urlId: string;
 }> = ({ open, onOpenChange, urlId }) => {
   const posthog = usePostHog();
-  const queryClient = trpc.useUtils();
   const router = useRouter();
   const deletePoll = trpc.polls.delete.useMutation({
     onSuccess: () => {
-      queryClient.polls.invalidate();
       posthog?.capture("deleted poll");
       onOpenChange(false);
       router.replace("/polls");

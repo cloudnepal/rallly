@@ -1,4 +1,5 @@
 "use client";
+import { usePostHog } from "@rallly/posthog/client";
 import { Button } from "@rallly/ui/button";
 import {
   Card,
@@ -17,11 +18,11 @@ import { useUnmount } from "react-use";
 import { PollSettingsForm } from "@/components/forms/poll-settings";
 import { Trans } from "@/components/trans";
 import { useUser } from "@/components/user-provider";
+import { trpc } from "@/trpc/client";
 import { setCookie } from "@/utils/cookies";
-import { usePostHog } from "@/utils/posthog";
-import { trpc } from "@/utils/trpc/client";
 
-import { NewEventData, PollDetailsForm, PollOptionsForm } from "./forms";
+import type { NewEventData } from "./forms";
+import { PollDetailsForm, PollOptionsForm } from "./forms";
 
 const required = <T,>(v: T | undefined): T => {
   if (!v) {
@@ -63,7 +64,6 @@ export const CreatePoll: React.FunctionComponent = () => {
   useUnmount(clear);
 
   const posthog = usePostHog();
-  const queryClient = trpc.useUtils();
   const createPoll = trpc.polls.create.useMutation({
     networkMode: "always",
     onSuccess: () => {
@@ -103,7 +103,6 @@ export const CreatePoll: React.FunctionComponent = () => {
                     last_poll_created_at: new Date().toISOString(),
                   },
                 });
-                queryClient.invalidate();
                 router.push(`/poll/${res.id}`);
               },
             },

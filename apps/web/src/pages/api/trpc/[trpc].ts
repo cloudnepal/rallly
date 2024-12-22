@@ -1,23 +1,15 @@
-import { createTRPCContext } from "@rallly/backend/trpc/context";
-import { AppRouter, appRouter } from "@rallly/backend/trpc/routers";
+import { posthogApiHandler } from "@rallly/posthog/server";
 import * as Sentry from "@sentry/nextjs";
+import { TRPCError } from "@trpc/server";
 import { createNextApiHandler } from "@trpc/server/adapters/next";
-import { Ratelimit } from "@upstash/ratelimit";
-import { kv } from "@vercel/kv";
 import requestIp from "request-ip";
 
-import { posthog, posthogApiHandler } from "@/app/posthog";
-import { absoluteUrl, shortUrl } from "@/utils/absolute-url";
-import { getServerSession, isEmailBlocked } from "@/utils/auth";
-import { isSelfHosted } from "@/utils/constants";
-import { emailClient } from "@/utils/emails";
+import { getServerSession } from "@/auth";
+import type { TRPCContext } from "@/trpc/context";
+import type { AppRouter } from "@/trpc/routers";
+import { appRouter } from "@/trpc/routers";
+import { getEmailClient } from "@/utils/emails";
 import { composeApiHandlers } from "@/utils/next";
-
-const ratelimit = new Ratelimit({
-  redis: kv,
-  // 5 requests from the same user in 10 seconds
-  limiter: Ratelimit.slidingWindow(5, "10 s"),
-});
 
 export const config = {
   api: {
@@ -28,41 +20,25 @@ export const config = {
 const trpcApiHandler = createNextApiHandler<AppRouter>({
   router: appRouter,
   createContext: async (opts) => {
-    const res = createTRPCContext(opts, {
-      async getUser({ req, res }) {
-        const session = await getServerSession(req, res);
+    const session = await getServerSession(opts.req, opts.res);
 
-        if (!session) {
-          return null;
-        }
+    if (!session) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Unauthorized",
+      });
+    }
 
-        return {
-          id: session.user.id,
-          isGuest: session.user.email === null,
-        };
+    return {
+      user: {
+        id: session.user.id,
+        isGuest: session.user.email === null,
+        locale: session.user.locale ?? undefined,
+        image: session.user.image ?? undefined,
+        getEmailClient: () => getEmailClient(session.user.locale ?? undefined),
       },
-      posthogClient: posthog || undefined,
-      emailClient,
-      isSelfHosted,
-      isEmailBlocked,
-      absoluteUrl,
-      shortUrl,
-      ratelimit: async () => {
-        if (!process.env.KV_REST_API_URL) {
-          return { success: true };
-        }
-
-        const clientIp = requestIp.getClientIp(opts.req);
-
-        if (!clientIp) {
-          return { success: false };
-        }
-
-        return ratelimit.limit(clientIp);
-      },
-    });
-
-    return res;
+      ip: requestIp.getClientIp(opts.req) ?? undefined,
+    } satisfies TRPCContext;
   },
   onError({ error }) {
     if (error.code === "INTERNAL_SERVER_ERROR") {

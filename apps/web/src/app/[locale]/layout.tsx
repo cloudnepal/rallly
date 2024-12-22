@@ -1,22 +1,20 @@
 import "tailwindcss/tailwind.css";
 import "../../style.css";
 
-import languages from "@rallly/languages";
 import { Toaster } from "@rallly/ui/toaster";
-import { Viewport } from "next";
+import type { Viewport } from "next";
 import { Inter } from "next/font/google";
 import React from "react";
 
+import { TimeZoneChangeDetector } from "@/app/[locale]/timezone-change-detector";
 import { Providers } from "@/app/providers";
+import { getServerSession } from "@/auth";
+import { SessionProvider } from "@/auth/session-provider";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
 });
-
-export async function generateStaticParams() {
-  return Object.keys(languages).map((locale) => ({ locale }));
-}
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -25,18 +23,25 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default function Root({
+export default async function Root({
   children,
   params: { locale },
 }: {
   children: React.ReactNode;
   params: { locale: string };
 }) {
+  const session = await getServerSession();
+
   return (
     <html lang={locale} className={inter.className}>
       <body>
         <Toaster />
-        <Providers>{children}</Providers>
+        <SessionProvider session={session}>
+          <Providers>
+            {children}
+            <TimeZoneChangeDetector />
+          </Providers>
+        </SessionProvider>
       </body>
     </html>
   );

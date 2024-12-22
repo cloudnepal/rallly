@@ -27,9 +27,9 @@ import {
 import Link from "next/link";
 
 import { LoginLink } from "@/components/login-link";
+import { OptimizedAvatarImage } from "@/components/optimized-avatar-image";
 import { RegisterLink } from "@/components/register-link";
 import { Trans } from "@/components/trans";
-import { CurrentUserAvatar } from "@/components/user";
 import { IfCloudHosted, IfSelfHosted } from "@/contexts/environment";
 import { Plan, usePlan } from "@/contexts/plan";
 import { isFeedbackEnabled } from "@/utils/constants";
@@ -57,7 +57,11 @@ export const UserDropdown = ({ className }: { className?: string }) => {
         className={cn("group min-w-0", className)}
       >
         <Button variant="ghost">
-          <CurrentUserAvatar size="xs" className="shrink-0 " />
+          <OptimizedAvatarImage
+            src={user.image ?? undefined}
+            name={user.name}
+            size="sm"
+          />
           <span className="truncate">{user.name}</span>
           <Icon>
             <ChevronDownIcon />

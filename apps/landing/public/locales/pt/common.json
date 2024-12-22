@@ -19,8 +19,9 @@
   "pricing": "Preço",
   "bestDoodleAlternative": "Melhor alternativa ao Doodle",
   "freeSchedulingPoll": "Sondagem de agendamento gratuita",
-  "findATime": "Encontrar uma hora",
   "getStarted": "Começar",
   "availabilityPoll": "Sondagem de disponibilidade",
-  "solutions": "Soluções"
+  "solutions": "Soluções",
+  "howItWorks": "Como Funciona",
+  "status": "Status"
 }

@@ -1,14 +1,14 @@
+import { usePostHog } from "@rallly/posthog/client";
 import { Button } from "@rallly/ui/button";
 import Link from "next/link";
 import { Trans } from "next-i18next";
 import React from "react";
 
-import { usePostHog } from "@/utils/posthog";
-
 export const UpgradeButton = ({
   children,
   annual,
-}: React.PropsWithChildren<{ annual?: boolean }>) => {
+  large,
+}: React.PropsWithChildren<{ annual?: boolean; large?: boolean }>) => {
   const posthog = usePostHog();
 
   return (
@@ -24,6 +24,7 @@ export const UpgradeButton = ({
         value={window.location.pathname}
       />
       <Button
+        size={large ? "lg" : "default"}
         className="w-full"
         type="submit"
         variant="primary"

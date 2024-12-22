@@ -1,27 +1,17 @@
 import * as aws from "@aws-sdk/client-ses";
 import { defaultProvider } from "@aws-sdk/credential-provider-node";
 import { renderAsync } from "@react-email/render";
-import { createTransport, Transporter } from "nodemailer";
+import { waitUntil } from "@vercel/functions";
+import type { Transporter } from "nodemailer";
+import { createTransport } from "nodemailer";
 import type Mail from "nodemailer/lib/mailer";
-import previewEmail from "preview-email";
-import React from "react";
 
-import * as templates from "./templates";
-import { EmailContext } from "./templates/_components/email-context";
-
-type Templates = typeof templates;
-
-type TemplateName = keyof typeof templates;
-
-type TemplateProps<T extends TemplateName> = Omit<
-  React.ComponentProps<TemplateComponent<T>>,
-  "ctx"
->;
-type TemplateComponent<T extends TemplateName> = Templates[T];
+import { i18nDefaultConfig, i18nInstance } from "./i18n";
+import { templates } from "./templates";
+import type { TemplateComponent, TemplateName, TemplateProps } from "./types";
 
 type SendEmailOptions<T extends TemplateName> = {
   to: string;
-  subject: string;
   props: TemplateProps<T>;
   attachments?: Mail.Options["attachments"];
 };
@@ -40,10 +30,6 @@ export type SupportedEmailProviders = EmailProviderConfig["name"];
 
 type EmailClientConfig = {
   /**
-   * Whether to open previews of each email in the browser
-   */
-  openPreviews?: boolean;
-  /**
    * Email provider config
    */
   provider: EmailProviderConfig;
@@ -59,7 +45,15 @@ type EmailClientConfig = {
   /**
    * Context to pass to each email
    */
-  context: EmailContext;
+  config: {
+    logoUrl: string;
+    baseUrl: string;
+    domain: string;
+    supportEmail: string;
+  };
+
+  locale?: string;
+  onError?: (error: Error) => void;
 };
 
 export class EmailClient {
@@ -70,16 +64,38 @@ export class EmailClient {
     this.config = config;
   }
 
+  queueTemplate<T extends TemplateName>(
+    templateName: T,
+    options: SendEmailOptions<T>,
+  ) {
+    const promise = this.sendTemplate(templateName, options);
+    waitUntil(promise);
+  }
+
   async sendTemplate<T extends TemplateName>(
     templateName: T,
     options: SendEmailOptions<T>,
   ) {
+    const locale = this.config.locale ?? "en";
+
+    await i18nInstance.init({
+      ...i18nDefaultConfig,
+      lng: locale,
+    });
+
+    const ctx = {
+      ...this.config.config,
+      i18n: i18nInstance,
+      t: i18nInstance.getFixedT(locale),
+    };
+
     const Template = templates[templateName] as TemplateComponent<T>;
+    const subject = Template.getSubject?.(options.props, ctx);
     const component = (
       <Template
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         {...(options.props as any)}
-        ctx={this.config.context}
+        ctx={ctx}
       />
     );
 
@@ -92,23 +108,28 @@ export class EmailClient {
       await this.sendEmail({
         from: this.config.mail.from,
         to: options.to,
-        subject: options.subject,
+        subject,
         html,
         text,
         attachments: options.attachments,
       });
     } catch (e) {
-      console.error("Error sending email", templateName, e);
+      const enhancedError = new Error(
+        `Failed to send email template: ${templateName}`,
+        {
+          cause: e instanceof Error ? e : new Error(String(e)),
+        },
+      );
+      Object.assign(enhancedError, {
+        templateName,
+        recipient: options.to,
+        subject,
+      });
+      this.config.onError?.(enhancedError);
     }
   }
 
   async sendEmail(options: Mail.Options) {
-    if (this.config.openPreviews) {
-      previewEmail(options, {
-        openSimulator: false,
-      });
-    }
-
     if (!process.env["SUPPORT_EMAIL"]) {
       console.info("ℹ SUPPORT_EMAIL not configured - skipping email send");
       return;

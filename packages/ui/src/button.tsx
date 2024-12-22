@@ -1,8 +1,10 @@
 "use client";
 import { Slot } from "@radix-ui/react-slot";
-import { cva, VariantProps } from "class-variance-authority";
-import * as React from "react";
+import type { VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { Loader2Icon } from "lucide-react";
+import * as React from "react";
+
 import { cn } from "./lib/utils";
 
 const buttonVariants = cva(
@@ -23,7 +25,7 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
-          "border-transparent bg-transparent text-gray-800 focus:border-gray-300 focus:bg-gray-200",
+          "border-transparent bg-transparent text-gray-800 hover:bg-gray-100 focus:bg-gray-200",
         link: "underline-offset-4 border-transparent hover:underline text-primary",
       },
       size: {

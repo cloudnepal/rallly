@@ -2,7 +2,7 @@ import { Button } from "@rallly/ui/button";
 import { FileSearchIcon } from "lucide-react";
 import Link from "next/link";
 
-import { getTranslation } from "@/app/i18n";
+import { getTranslation } from "@/i18n/server";
 
 export default async function Page() {
   // TODO (Luke Vella) [2023-11-03]: not-found doesn't have access to params right now
@@ -10,11 +10,11 @@ export default async function Page() {
   const { t } = await getTranslation("en");
 
   return (
-    <div className="flex h-[calc(100vh-100px)] w-full items-center justify-center">
+    <div className="flex h-screen w-full items-center justify-center">
       <div className="space-y-8">
         <div className="space-y-4 text-center">
           <FileSearchIcon className="mb-4 inline-block size-24 text-gray-400" />
-          <div className="text-primary-600 mb-2 text-3xl font-bold ">
+          <div className="text-primary-600 mb-2 text-3xl font-bold">
             {t("errors_notFoundTitle")}
           </div>
           <p className="text-gray-600">{t("errors_notFoundDescription")}</p>

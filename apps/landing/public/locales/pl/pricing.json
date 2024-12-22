@@ -1,5 +1,4 @@
 {
-  "pricing": "Cennik",
   "pricingDescription": "Rozpocznij za darmo. Logowanie nie jest wymagane.",
   "freeForever": "darmowy na zawsze",
   "planPro": "Pro",
@@ -27,5 +26,9 @@
   "planFree": "Darmowy",
   "keepPollsIndefinitely": "Przechowuj ankiety w nieskończoność",
   "whenPollInactive": "Kiedy ankieta staje się nieaktywna?",
-  "whenPollInactiveAnswer": "Ankiety stają się nieaktywne, gdy wszystkie opcje daty znajdują się w przeszłości ORAZ ankieta nie była używana przez ponad 30 dni. Nieaktywne ankiety są automatycznie usuwane, jeśli użytkownik nie posiada płatnej subskrypcji."
+  "whenPollInactiveAnswer": "Ankiety stają się nieaktywne, gdy wszystkie opcje daty znajdują się w przeszłości ORAZ ankieta nie była używana przez ponad 30 dni. Nieaktywne ankiety są automatycznie usuwane, jeśli użytkownik nie posiada płatnej subskrypcji.",
+  "yearlyBillingDescription": "rocznie",
+  "annualBenefit": "{count} miesiące gratis",
+  "pricingTitle": "Zacznij za darmo",
+  "pricingSubtitle": "Przejdź na płatny plan, aby uzyskać dostęp do funkcji premium"
 }

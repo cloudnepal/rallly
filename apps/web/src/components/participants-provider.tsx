@@ -1,10 +1,10 @@
-import { Participant, VoteType } from "@rallly/database";
+import type { Participant, VoteType } from "@rallly/database";
 import * as React from "react";
 
 import { useVisibility } from "@/components/visibility";
 import { usePermissions } from "@/contexts/permissions";
-import { trpc } from "@/utils/trpc/client";
-import { Vote } from "@/utils/trpc/types";
+import { trpc } from "@/trpc/client";
+import type { Vote } from "@/trpc/client/types";
 
 import { useRequiredContext } from "./use-required-context";
 
@@ -21,15 +21,9 @@ export const ParticipantsProvider: React.FunctionComponent<{
   children?: React.ReactNode;
   pollId: string;
 }> = ({ children, pollId }) => {
-  const { data: participants } = trpc.polls.participants.list.useQuery(
-    {
-      pollId,
-    },
-    {
-      staleTime: 1000 * 10,
-      cacheTime: Infinity,
-    },
-  );
+  const { data: participants } = trpc.polls.participants.list.useQuery({
+    pollId,
+  });
 
   const getParticipants = (
     optionId: string,

@@ -3,7 +3,6 @@
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-const i18n = require("./i18n.config.js");
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
@@ -16,14 +15,14 @@ function createAppUrl(subpath) {
 }
 
 const nextConfig = {
-  i18n: i18n,
   productionBrowserSourceMaps: true,
   output: "standalone",
   transpilePackages: [
-    "@rallly/backend",
     "@rallly/icons",
     "@rallly/ui",
     "@rallly/tailwind-config",
+    "@rallly/utils",
+    "next-mdx-remote",
   ],
   webpack(config) {
     config.module.rules.push({
@@ -42,6 +41,12 @@ const nextConfig = {
       {
         source: "/support",
         destination: "https://support.rallly.co",
+        permanent: true,
+      },
+      // Ad-Blockers block the DigitalOcean logo, when we use our referral link
+      {
+        source: "/partners/digitalocean",
+        destination: "https://m.do.co/c/f91efc9c9e50",
         permanent: true,
       },
       {

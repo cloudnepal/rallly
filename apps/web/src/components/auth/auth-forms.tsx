@@ -7,11 +7,9 @@ import { useForm } from "react-hook-form";
 import { requiredString } from "../../utils/form-validation";
 
 export const verifyCode = async (options: { email: string; token: string }) => {
-  const url = `${
-    window.location.origin
-  }/api/auth/callback/email?email=${encodeURIComponent(options.email)}&token=${
-    options.token
-  }`;
+  const url = `${window.location.origin
+    }/api/auth/callback/email?email=${encodeURIComponent(options.email)}&token=${options.token
+    }`;
 
   const res = await fetch(url);
 
@@ -53,7 +51,7 @@ export const VerifyCode: React.FunctionComponent<{
             <Trans
               t={t}
               i18nKey="verificationCodeSentTo"
-              defaults="We sent a verification code to <b>{{ email }}</b>"
+              defaults="We sent a verification code to <b>{email}</b>"
               values={{ email }}
               components={{
                 b: <strong className="whitespace-nowrap" />,

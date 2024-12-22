@@ -4,7 +4,7 @@ import { cn } from "@rallly/ui";
 import { Link } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-import { IconComponent } from "@/types";
+import type { IconComponent } from "@/types";
 
 export function MenuItem({
   href,
@@ -24,7 +24,7 @@ export function MenuItem({
         isCurrent
           ? "bg-gray-200 text-indigo-600"
           : "hover:text-primary text-gray-700",
-        "group flex  items-center gap-x-3 rounded-md px-3 py-2 text-sm font-semibold leading-6",
+        "group flex items-center gap-x-3 rounded-md px-3 py-2 text-sm font-semibold leading-6",
       )}
     >
       <Icon

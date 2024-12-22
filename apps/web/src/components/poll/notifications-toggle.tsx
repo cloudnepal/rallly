@@ -1,3 +1,4 @@
+import { usePostHog } from "@rallly/posthog/client";
 import { Button } from "@rallly/ui/button";
 import { Icon } from "@rallly/ui/icon";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@rallly/ui/tooltip";
@@ -9,8 +10,7 @@ import * as React from "react";
 import { Skeleton } from "@/components/skeleton";
 import { Trans } from "@/components/trans";
 import { useUser } from "@/components/user-provider";
-import { usePostHog } from "@/utils/posthog";
-import { trpc } from "@/utils/trpc/client";
+import { trpc } from "@/trpc/client";
 
 import { usePoll } from "../poll-context";
 
@@ -50,7 +50,6 @@ const NotificationsToggle: React.FunctionComponent = () => {
           return [...oldWatchers, { userId: user.id }];
         },
       );
-      queryClient.polls.invalidate();
     },
   });
 
@@ -69,7 +68,6 @@ const NotificationsToggle: React.FunctionComponent = () => {
           return oldWatchers.filter(({ userId }) => userId !== user.id);
         },
       );
-      queryClient.polls.invalidate();
     },
   });
 
@@ -126,11 +124,11 @@ const NotificationsToggle: React.FunctionComponent = () => {
             values={{
               value: isWatching
                 ? t("notificationsOn", {
-                    defaultValue: "On",
-                  })
+                  defaultValue: "On",
+                })
                 : t("notificationsOff", {
-                    defaultValue: "Off",
-                  }),
+                  defaultValue: "Off",
+                }),
             }}
           />
         )}

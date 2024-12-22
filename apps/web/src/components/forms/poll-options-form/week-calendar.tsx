@@ -4,13 +4,14 @@ import "./rbc-overrides.css";
 import dayjs from "dayjs";
 import { XIcon } from "lucide-react";
 import React from "react";
-import { Calendar, CalendarProps } from "react-big-calendar";
+import type { CalendarProps } from "react-big-calendar";
+import { Calendar } from "react-big-calendar";
 import { createBreakpoint } from "react-use";
 
 import { getDuration } from "../../../utils/date-time-utils";
 import DateNavigationToolbar from "./date-navigation-toolbar";
 import dayjsLocalizer from "./dayjs-localizer";
-import { DateTimeOption, DateTimePickerProps } from "./types";
+import type { DateTimeOption, DateTimePickerProps } from "./types";
 import { formatDateWithoutTz } from "./utils";
 
 const localizer = dayjsLocalizer(dayjs);
@@ -100,7 +101,7 @@ const WeekCalendar: React.FunctionComponent<DateTimePickerProps> = ({
               <div
                 // onClick prop doesn't work properly. Seems like some other element is cancelling the event before it reaches this element
                 onMouseUp={props.onClick}
-                className="text-primary-500 border-primary-300 hover:border-primary-400 hover:text-primary-600 group absolute ml-1 flex max-h-full flex-col  justify-between overflow-hidden rounded-lg border border-dashed bg-white/50 p-1 text-xs shadow-sm hover:cursor-pointer"
+                className="text-primary-500 border-primary-300 hover:border-primary-400 hover:text-primary-600 group absolute ml-1 flex max-h-full flex-col justify-between overflow-hidden rounded-lg border border-dashed bg-white/50 p-1 text-xs shadow-sm hover:cursor-pointer"
                 style={{
                   top: `calc(${props.style?.top}% + 4px)`,
                   height: `calc(${props.style?.height}% - 8px)`,
@@ -126,7 +127,7 @@ const WeekCalendar: React.FunctionComponent<DateTimePickerProps> = ({
             header: function Header({ date }: any) {
               return (
                 <span className="w-full rounded-md text-center text-sm tracking-tight">
-                  <span className="mr-1.5  font-normal opacity-50">
+                  <span className="mr-1.5 font-normal opacity-50">
                     {dayjs(date).format("ddd")}
                   </span>
                   <span className="font-medium">
@@ -142,7 +143,7 @@ const WeekCalendar: React.FunctionComponent<DateTimePickerProps> = ({
             children?: React.ReactNode;
           }) {
             return (
-              <div className="h-6  text-xs leading-none text-gray-500">
+              <div className="h-6 text-xs leading-none text-gray-500">
                 {children}
               </div>
             );

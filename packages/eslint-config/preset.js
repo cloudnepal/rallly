@@ -2,8 +2,15 @@
 module.exports = function (workspaceDirPath) {
   return {
     root: true,
-    extends: ["next", "turbo"],
-    plugins: ["simple-import-sort", "@typescript-eslint"],
+    extends: ["turbo"],
+    plugins: [
+      "eslint-plugin-import",
+      "simple-import-sort",
+      "@typescript-eslint",
+    ],
+    env: {
+      es6: true,
+    },
     ignorePatterns: ["dist/", "playwright-report/"],
     globals: {
       React: true,
@@ -11,7 +18,7 @@ module.exports = function (workspaceDirPath) {
     },
     parserOptions: {
       tsconfigRootDir: workspaceDirPath,
-      project: `${workspaceDirPath}/tsconfig.json`,
+      project: workspaceDirPath + "/tsconfig.json",
     },
     overrides: [
       {
@@ -21,6 +28,14 @@ module.exports = function (workspaceDirPath) {
         extends: ["plugin:@typescript-eslint/recommended"],
         rules: {
           "@typescript-eslint/no-unused-vars": "error",
+          "@typescript-eslint/consistent-type-imports": [
+            "error",
+            {
+              prefer: "type-imports",
+              fixStyle: "separate-type-imports",
+              disallowTypeAnnotations: true,
+            },
+          ],
         },
       },
     ],

@@ -23,6 +23,16 @@ jobs:
       - name: Check types
         run: yarn type-check
 
+  sherif:
+    name: Sherif
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+
+      - name: Run sherif
+        run: npx sherif@latest
+
   linting:
     name: Linting
     runs-on: ubuntu-latest
@@ -49,6 +59,10 @@ jobs:
   integration-tests:
     name: Integration tests
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5450/rallly
+      DIRECT_DATABASE_URL: postgresql://postgres:postgres@localhost:5450/rallly
+      CI: true
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node
@@ -61,11 +75,6 @@ jobs:
       - name: Install playwright dependencies
         run: yarn playwright install --with-deps chromium
 
-      - name: Set environment variables
-        run: |
-          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5450/rallly" >> $GITHUB_ENV
-          echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> $GITHUB_ENV
-
       - name: Create production build
         run: yarn turbo build:test --filter=@rallly/web
 
@@ -76,7 +85,7 @@ jobs:
         run: yarn db:deploy
 
       - name: Run tests
-        run: yarn test:integration
+        run: yarn turbo test:integration
 
       - name: Upload artifact playwright-report
         if: ${{ success() || failure() }}

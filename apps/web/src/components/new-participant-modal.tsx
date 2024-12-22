@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { VoteType } from "@rallly/database";
+import type { VoteType } from "@rallly/database";
 import { Badge } from "@rallly/ui/badge";
 import { Button } from "@rallly/ui/button";
 import { FormMessage } from "@rallly/ui/form";
 import { Input } from "@rallly/ui/input";
+import * as Sentry from "@sentry/nextjs";
 import { TRPCClientError } from "@trpc/client";
 import clsx from "clsx";
 import { useTranslation } from "next-i18next";
@@ -18,13 +19,13 @@ import VoteIcon from "./poll/vote-icon";
 
 const requiredEmailSchema = z.object({
   requireEmail: z.literal(true),
-  name: z.string().nonempty().max(100),
+  name: z.string().min(1).max(100),
   email: z.string().email(),
 });
 
 const optionalEmailSchema = z.object({
   requireEmail: z.literal(false),
-  name: z.string().nonempty().max(100),
+  name: z.string().min(1).max(100),
   email: z.string().email().or(z.literal("")),
 });
 
@@ -115,9 +116,10 @@ export const NewParticipantForm = (props: NewParticipantModalProps) => {
         } catch (error) {
           if (error instanceof TRPCClientError) {
             setError("root", {
-              message: error.shape.message,
+              message: error.message,
             });
           }
+          Sentry.captureException(error);
         }
       })}
       className="space-y-4"

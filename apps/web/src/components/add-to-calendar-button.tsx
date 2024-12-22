@@ -9,14 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "@rallly/ui/dropdown-menu";
 import { Icon } from "@rallly/ui/icon";
-import {
-  CalendarEvent,
-  google,
-  ics,
-  office365,
-  outlook,
-  yahoo,
-} from "calendar-link";
+import type { CalendarEvent } from "calendar-link";
+import { google, ics, office365, outlook, yahoo } from "calendar-link";
 import { DownloadIcon, PlusIcon } from "lucide-react";
 import Image from "next/image";
 
@@ -57,24 +51,7 @@ export function AddToCalendarButton({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          onClick={() => {
-            const res = ics(calendarEvent);
-
-            // download the file
-            const blob = new Blob([res], { type: "text/calendar" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute(
-              "download",
-              `${title.toLocaleLowerCase().replace(/\s/g, "-")}.ics`,
-            );
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          }}
-        >
+        <Button>
           <Icon>
             <PlusIcon />
           </Icon>
@@ -134,7 +111,22 @@ export function AddToCalendarButton({
           <Trans i18nKey="yahoo" defaults="Yahoo" />
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            const data = ics(calendarEvent);
+
+            // download the file
+            const link = document.createElement("a");
+            link.setAttribute("href", data);
+            link.setAttribute(
+              "download",
+              `${title.toLocaleLowerCase().replace(/\s/g, "-")}.ics`,
+            );
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }}
+        >
           <Icon>
             <DownloadIcon />
           </Icon>
